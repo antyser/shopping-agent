@@ -1,0 +1,97 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+We built an AI shopping assistant in chrome extension format to give user insight while browsing ecommerce sites (only Amazon for now). 
+Goal
+1. To setup an app foundation using firebase, chrome extension and external server endpoint.
+2. Basic features (UI + mock server endpoints). The endpoint implementation is out of scope
+  1. Auth
+  2. Insights
+  3. Chat
+3. In app Data Tracking.
+Tech stack
+- Frontend (Chrome Extension):
+  - Language: Typescript (ES6+)
+  - Markup/Styling: HTML5, CSS3
+  - Framework: Vanilla JavaScript (Recommended for MVP simplicity, but React/Vue/Svelte are options for UI components if preferred)
+  - Build Tool: Webpack (Recommended for bundling modules, managing assets, environment variables) or Parcel/Vite
+  - APIs: Chrome Extension APIs (Manifest V3: Service Worker, chrome.runtime, chrome.storage, chrome.tabs, chrome.identity, chrome.scripting)
+- Backend & Infrastructure:
+  - Platform: Firebase
+  - Services:
+    - Firebase Authentication (Google Sign-In, Email/Password recommended to start)
+    - Firebase Firestore (For storing detailed events)
+    - Firebase Analytics (For aggregated usage metrics)
+  - SDK: Firebase SDK for Web (v9+, modular)
+- Mock API Endpoint:
+  - Platform: Firebase Cloud Functions (Recommended for integration)
+  - Runtime: Node.js
+  - Framework: Express.js (Optional, but helpful for routing within Cloud Functions)
+- Development & Tooling:
+  - Version Control: Git / GitHub (or similar)
+  - Package Manager: npm or yarn
+  - Utility Libraries:
+    - uuid: For generating unique session IDs.
+    - lodash.throttle, lodash.debounce: For rate-limiting frequent events (scroll, type).
+
+Work on the task one by one check when you finish each task.
+
+---
+1. High-Level Plan & Task List
+Phase 0: Project Setup & Foundation (Est. 1-2 days)
+- [X] Task 0.1: Initialize Git repository.
+- [X] Task 0.2: Setup Node.js project (npm init), install core dependencies (firebase, build tool like webpack, loaders/plugins).
+- [X] Task 0.3: Configure Webpack (or chosen build tool) for building the extension (background, content, popup scripts), handling assets, and managing environment variables (e.g., for Firebase config).
+- [X] Task 0.4: Create Firebase project via Firebase Console.
+- [X] Task 0.5: Enable Firebase Services: 
+  - [X] Authentication (Choose providers: Google, Email/Password).
+  - [X] Firestore Database (Native Mode, set initial restrictive security rules).
+  - [X] Google Analytics.
+- [x] Task 0.6: Create basic Chrome Extension structure (src/manifest.json, empty script files as per structure). Configure manifest.json (V3, name, basic permissions: storage, identity).
+Phase 1: Authentication Implementation (Est. 2-3 days)
+- [X] Task 1.1 (Background): Integrate Firebase SDK (firebase/app, firebase/auth) in background/firebase.js and initialize in background/index.js.
+- [X] Task 1.2 (Background): Implement core auth logic in background/auth.js (sign-in, sign-out functions using SDK, potentially using chrome.identity for Google Sign-In).
+- [X] Task 1.3 (Background): Listen for auth state changes (onAuthStateChanged) and store user state/ID token presence in chrome.storage.local or manage within the service worker.
+- [x] Task 1.4 (Popup): Build basic login/logout UI in popup.html & popup.css.
+- [x] Task 1.5 (Popup): Implement popup.js logic to: 
+  - [x] Display login/logout state based on storage/message from background.
+  - [x] Trigger sign-in/sign-out functions (via message passing to background script).
+- [X] Task 1.6 (Firestore): Define initial security rules allowing authenticated users to potentially write data (placeholder for events later). Test rules.
+- [ ] Task 1.7 (Mock API): (Optional) Update mock endpoint (/authCheck?) to expect Authorization: Bearer <ID_TOKEN> header and log its presence/decode it (no strict validation needed for MVP).
+Phase 2: Core Features - Insights & Chat (Mocked) (Est. 3-4 days)
+- [ ] Task 2.1 (Insights - Content): Implement logic in content/index.js to detect Amazon product pages (URL matching).
+- [ ] Task 2.2 (Insights - Communication): Send message from content script to background script containing product identifier/URL.
+- [ ] Task 2.3 (Insights - Background): In background/api.js, create function to call mock /insights endpoint. Retrieve user ID token (if logged in) and pass it in the header.
+- [ ] Task 2.4 (Insights - Background): Handle message from content script, call the API function, receive mock response.
+- [ ] Task 2.5 (Insights - UI): Decide on UI (popup or injected). Implement logic to display mock insights data received from background script. Update manifest.json permissions if needed (scripting, host permissions for API/Amazon).
+- [ ] Task 2.6 (Insights - Mock API): Implement /insights Cloud Function route to accept requests, log input (optional), and return hardcoded mock insight JSON. Deploy.
+- [ ] Task 2.7 (Chat - UI): Build chat interface in popup.html & popup.css (message list, input field, send button).
+- [ ] Task 2.8 (Chat - Popup): Implement popup.js logic to: 
+  - [ ] Get user input.
+  - [ ] Send message content to background script for API call.
+  - [ ] Display user message and API mock response in the UI.
+- [ ] Task 2.9 (Chat - Background): In background/api.js, create function to call mock /chat endpoint, passing message and ID token. Handle the call triggered by popup message. Send response back to popup.
+- [ ] Task 2.10 (Chat - Mock API): Implement /chat Cloud Function route to accept requests, log input (optional), and return hardcoded mock chat reply JSON. Deploy.
+Phase 3: Event Tracking Implementation (Est. 3-5 days)
+- [ ] Task 3.1 (Background): Integrate Firebase SDK (firebase/firestore) in background/firebase.js.
+- [ ] Task 3.2 (Background): Implement session ID generation (uuid) and management logic in background/eventTracker.js or similar (link to user session, browser tabs/windows). Store/retrieve using chrome.storage.session or background state.
+- [ ] Task 3.3 (Background): Implement device_info capture logic.
+- [ ] Task 3.4 (Background): Create central trackEvent(eventType, eventData, pageIdentifier, errorInfo) function in background/eventTracker.js: 
+  - [ ] Gathers all required fields (user_id, session_id, device_info, timestamp, Browse_url, etc.).
+  - [ ] Constructs the event object matching the schema.
+  - [ ] Writes the object to events collection in Firestore using addDoc.
+- [ ] Task 3.5 (Extension-wide): Implement event listeners in appropriate places (popup, content, background) for all defined event_types (view, click, hover, load, scroll, type).
+- [ ] Task 3.6 (Extension-wide): Implement throttling/debouncing for scroll, type, hover events before calling trackEvent. Calculate scroll percentages.
+- [ ] Task 3.7 (Firestore): Refine and test Firestore Security Rules specifically for the events collection (allow authenticated users to create events with their own user_id, deny reads/updates/deletes from client).
+- [ ] Task 3.8 (Background/Analytics): (Optional but recommended) Integrate Firebase Analytics SDK (firebase/analytics) and log high-level aggregate events (e.g., login, extension_opened, insight_requested).
+Phase 4: Refinement, Testing & Packaging (Est. 1-2 days)
+- [ ] Task 4.1: Code review, cleanup, and refactoring. Add comments.
+- [ ] Task 4.2: Implement basic error handling (try/catch around API calls, Firestore writes, populate errors field in events).
+- [ ] Task 4.3: Test core functionality thoroughly (Auth flows, Insight display, Chat interaction, Event generation in Firestore console). Check browser console for errors.
+- [ ] Task 4.4: Optimize build process.
+- [ ] Task 4.5: Create final build and package the extension (.zip) for testing/distribution.
+- [ ] Task 4.6: Update README.md with setup and usage instructions.
+
+

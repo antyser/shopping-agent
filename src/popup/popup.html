@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Agent</title>
+    <link rel="stylesheet" href="popup.css"> </head>
+<body>
+    <div class="container">
+        <h1>Shopping Agent</h1>
+        
+        <div id="user-status" class="user-status">
+            <!-- Status will be updated by JS -->
+            <p>Loading status...</p>
+        </div>
+
+        <div id="auth-actions" class="auth-actions">
+            <button id="login-button" class="btn">Login with Google</button>
+            <button id="logout-button" class="btn btn-secondary" style="display: none;">Logout</button>
+        </div>
+
+        <!-- Add placeholders for chat/insights later -->
+        <hr>
+        <div id="feature-area">
+            <p><i>(Chat & Insights features coming soon)</i></p>
+        </div>
+
+    </div>
+    <script src="popup.js"></script> <!-- Webpack will inject this -->
+</body>
+</html>
