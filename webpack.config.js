@@ -7,9 +7,8 @@ module.exports = {
   mode: "development", // Switch to 'production' for production builds
   devtool: "cheap-module-source-map", // Or 'source-map' for better quality
   entry: {
-    popup: "./src/popup/popup.ts",
     background: "./src/background/index.ts",
-    content: "./src/content/index.ts",
+    content: "./src/content/index.tsx",
     // Add other entry points if needed (e.g., options page)
   },
   output: {
@@ -18,12 +17,12 @@ module.exports = {
     clean: true, // Clean the dist folder before each build
   },
   resolve: {
-    extensions: [".ts", ".js"], // Resolve these extensions
+    extensions: [".tsx", ".ts", ".js"],
   },
   module: {
     rules: [
       {
-        test: /\.ts$/,
+        test: /\.tsx?$/,
         use: "ts-loader",
         exclude: /node_modules/,
       },
@@ -35,12 +34,6 @@ module.exports = {
     ],
   },
   plugins: [
-    // Generates popup.html from template and injects popup.js
-    new HtmlWebpackPlugin({
-      template: "./src/popup/popup.html",
-      filename: "popup.html",
-      chunks: ["popup"], // Only include the popup chunk
-    }),
     // Copies manifest.json and assets to the dist folder
     new CopyWebpackPlugin({
       patterns: [

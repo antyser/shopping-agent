@@ -1,10 +1,20 @@
-import { onAuthStateChanged, type User } from "firebase/auth";
+import {
+  onAuthStateChanged,
+  type User,
+  type UserCredential,
+} from "firebase/auth";
 import { auth } from "./firebase";
-import { signInWithGoogle, signOutUser } from "./auth";
-import { fetchProductInsights } from "./api"; // Import the API function
+import {
+  signInWithGoogle,
+  signOutUser,
+  signUpAndVerifyUser,
+  signInWithEmail,
+  resendVerificationEmailHandler,
+} from "./auth";
+import { fetchProductInsights } from "./api";
 
 console.log("Background script started.");
-console.log("Firebase Auth service:", auth); // Log the imported auth service
+console.log("Firebase Auth service:", auth);
 
 /**
  * Listens for Firebase Auth state changes and updates chrome.storage.local.
@@ -12,103 +22,295 @@ console.log("Firebase Auth service:", auth); // Log the imported auth service
 onAuthStateChanged(auth, (user: User | null) => {
   if (user) {
     // User is signed in
-    console.log("Auth state changed: User is signed in", user.uid);
-    chrome.storage.local.set({ isLoggedIn: true, userId: user.uid }, () => {
-      if (chrome.runtime.lastError) {
-        console.error(
-          "Error setting auth state in storage:",
-          chrome.runtime.lastError
-        );
-      }
-      // You could optionally get and store the ID token here if needed frequently,
-      // but it's often better to get it on demand using user.getIdToken()
-      // user.getIdToken().then((token) => { ... });
+    console.log("Auth state changed: User is signed in", {
+      uid: user.uid,
+      email: user.email,
+      emailVerified: user.emailVerified,
+      displayName: user.displayName,
+      photoURL: user.photoURL,
     });
+    chrome.storage.local.set(
+      {
+        isLoggedIn: true,
+        userId: user.uid,
+        email: user.email || null,
+        displayName: user.displayName || null,
+        photoURL: user.photoURL || null,
+        emailVerified: user.emailVerified,
+      },
+      () => {
+        if (chrome.runtime.lastError) {
+          console.error(
+            "Error setting auth state in storage:",
+            chrome.runtime.lastError
+          );
+        }
+      }
+    );
   } else {
     // User is signed out
     console.log("Auth state changed: User is signed out");
-    chrome.storage.local.set({ isLoggedIn: false, userId: null }, () => {
-      if (chrome.runtime.lastError) {
-        console.error(
-          "Error clearing auth state in storage:",
-          chrome.runtime.lastError
-        );
+    chrome.storage.local.set(
+      {
+        isLoggedIn: false,
+        userId: null,
+        email: null,
+        displayName: null,
+        photoURL: null,
+        emailVerified: null,
+      },
+      () => {
+        if (chrome.runtime.lastError) {
+          console.error(
+            "Error clearing auth state in storage:",
+            chrome.runtime.lastError
+          );
+        }
       }
-    });
+    );
   }
 });
-console.log("Auth state listener added.");
+console.log("Auth state listener added (includes emailVerified and email).");
 
 /**
  * Listens for messages from other parts of the extension (e.g., popup).
  */
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  console.log("Message received in background:", message);
+  console.log(
+    "Unified Message Listener: Received message:",
+    message,
+    "from sender:",
+    sender
+  );
 
-  if (message.action === "login") {
+  // --- Actions typically from Popup or Options page ---
+  if (message.action === "loginWithGoogle") {
+    console.log("Handling 'loginWithGoogle' action...");
     signInWithGoogle()
-      .then((userCredential) => {
-        console.log("Background: Login successful", userCredential.user.uid);
-        sendResponse({ status: "success" });
+      .then((userCredential: UserCredential | null) => {
+        console.log(
+          "Background: Google Login successful",
+          userCredential?.user?.uid
+        );
+        sendResponse({ status: "success", userId: userCredential?.user?.uid });
       })
-      .catch((error) => {
-        console.error("Background: Login failed", error);
-        sendResponse({ status: "error", error: error.message });
+      .catch((error: Error) => {
+        console.error("Background: Google Login failed", error);
+        let errorCode: string | null = null;
+        if (error && typeof error === "object" && "code" in error) {
+          errorCode = (error as { code: string }).code;
+        }
+        const errorMessage = error.message;
+        if (
+          errorCode === "auth/popup-closed-by-user" ||
+          errorCode === "auth/cancelled-popup-request"
+        ) {
+          sendResponse({
+            status: "cancelled",
+            error: "Login cancelled by user.",
+          });
+        } else if (errorCode === "auth/network-request-failed") {
+          sendResponse({
+            status: "error",
+            error: "Network error during login. Please check connection.",
+          });
+        } else if (error.message && error.message.includes("chrome.identity")) {
+          sendResponse({
+            status: "error",
+            error:
+              "Browser identity error. Ensure extension permissions are granted.",
+          });
+        } else {
+          sendResponse({
+            status: "error",
+            error: errorMessage || "An unknown login error occurred.",
+          });
+        }
       });
-    return true; // Indicate that sendResponse will be called asynchronously
-  } else if (message.action === "logout") {
+    return true;
+  }
+
+  if (message.action === "loginWithEmail") {
+    console.log("Handling 'loginWithEmail' action...");
+    const { email, password } = message;
+
+    if (!email || !password) {
+      console.error("Background: Login missing email or password.");
+      sendResponse({
+        status: "error",
+        error: "Email and password are required for login.",
+      });
+      return false;
+    }
+
+    signInWithEmail(email, password)
+      .then((userCredential: UserCredential) => {
+        console.log(
+          "Background: Email Login successful",
+          userCredential.user.uid
+        );
+        sendResponse({ status: "success", userId: userCredential.user.uid });
+      })
+      .catch((error: Error) => {
+        console.error("Background: Email Login failed", error);
+        sendResponse({
+          status: "error",
+          error: error.message || "Login failed.",
+        });
+      });
+    return true;
+  }
+
+  if (message.action === "signupWithEmail") {
+    console.log("Handling 'signupWithEmail' action...");
+    const { email, password, nickname } = message;
+    if (!email || !password) {
+      console.error("Background: Signup missing email or password.");
+      sendResponse({
+        status: "error",
+        error: "Email and password are required for signup.",
+      });
+      return false;
+    }
+    if (password.length < 6) {
+      console.error("Background: Signup password too short.");
+      sendResponse({
+        status: "error",
+        error: "Password must be at least 6 characters long.",
+      });
+      return false;
+    }
+    signUpAndVerifyUser(email, password, nickname || null)
+      .then((userCredential: UserCredential) => {
+        console.log(
+          "Background: Email Signup successful",
+          userCredential.user.uid
+        );
+        sendResponse({
+          status: "success",
+          userId: userCredential.user.uid,
+          message: "Account created, verification email sent.",
+        });
+      })
+      .catch((error: Error) => {
+        console.error("Background: Email Signup failed", error);
+        sendResponse({
+          status: "error",
+          error: error.message || "Signup failed.",
+        });
+      });
+    return true;
+  }
+
+  if (message.action === "logout") {
+    console.log("Handling 'logout' action...");
     signOutUser()
       .then(() => {
         console.log("Background: Logout successful");
         sendResponse({ status: "success" });
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         console.error("Background: Logout failed", error);
         sendResponse({ status: "error", error: error.message });
       });
-    return true; // Indicate that sendResponse will be called asynchronously
-  }
-
-  // Handle other message types if needed
-  console.log("Unknown message action:", message.action);
-  // Return false or undefined if not handling the message asynchronously
-  return false;
-});
-
-// --- Message Listener for Content Script Communication ---
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  console.log("Message received:", message);
-  console.log("Sender:", sender);
-
-  // Check if the message is from our content script and has the correct type
-  if (message.type === "PRODUCT_PAGE_DETECTED" && message.url) {
-    console.log(`Product page detected: ${message.url}. Fetching insights...`);
-
-    // Call the async API function
-    fetchProductInsights(message.url)
-      .then((insights) => {
-        console.log("Sending insights back to content script:", insights);
-        // Send the insights back to the content script
-        sendResponse({ success: true, data: insights });
-      })
-      .catch((error) => {
-        console.error("Error fetching insights:", error);
-        const errorMessage =
-          error instanceof Error ? error.message : "Failed to fetch insights";
-        sendResponse({ success: false, error: errorMessage });
-      });
-
-    // Return true to indicate that sendResponse will be called asynchronously
     return true;
   }
 
-  // Handle other message types if needed in the future
-  console.log("Unhandled message type or origin.");
-  // Return false or undefined if not handling the message asynchronously
+  // Task 6.1: Add handler for resendVerificationEmail
+  if (message.action === "resendVerificationEmail") {
+    console.log("Handling 'resendVerificationEmail' action...");
+    resendVerificationEmailHandler()
+      .then(() => {
+        console.log("Background: Resend verification email successful.");
+        sendResponse({
+          status: "success",
+          message: "Verification email resent.",
+        });
+      })
+      .catch((error: Error) => {
+        console.error("Background: Resend verification email failed", error);
+        sendResponse({
+          status: "error",
+          error: error.message || "Failed to resend email.",
+        });
+      });
+    return true; // Indicate async response
+  }
+
+  // --- Messages typically from Content Script ---
+  if (message.type === "PRODUCT_PAGE_DETECTED" && message.url) {
+    console.log(
+      `Handling 'PRODUCT_PAGE_DETECTED': ${message.url}. Fetching insights and auth status...`
+    );
+    chrome.storage.local.get(["isLoggedIn", "userId"], async (storage) => {
+      const isLoggedIn = storage.isLoggedIn === true;
+      const userId = storage.userId || null;
+      console.log("Current auth status from storage:", { isLoggedIn, userId });
+      if (!isLoggedIn) {
+        console.log("User not logged in. Sending response without insights.");
+        sendResponse({ success: true, isLoggedIn: false, userId: null });
+        return;
+      }
+      try {
+        const insights = await fetchProductInsights(message.url);
+        console.log("Sending insights back to content script:", insights);
+        sendResponse({
+          success: true,
+          isLoggedIn: true,
+          userId: userId,
+          data: insights,
+        });
+      } catch (error: Error | unknown) {
+        console.error("Error fetching insights:", error);
+        const errorMessage =
+          error instanceof Error ? error.message : "Failed to fetch insights";
+        sendResponse({
+          success: false,
+          isLoggedIn: true,
+          userId: userId,
+          error: errorMessage,
+        });
+      }
+    });
+    return true;
+  }
+
+  // --- Default handling for unrecognised messages ---
+  console.log(
+    "Unified Message Listener: Unhandled message type/action:",
+    message.type || message.action
+  );
   return false;
 });
 
-console.log("Message listener added.");
+console.log("Unified Message listener added.");
+
+// Listen for clicks on the browser action icon
+chrome.action.onClicked.addListener((tab) => {
+  console.log("Background script: Action icon clicked for tab:", tab.id);
+
+  // Ensure the tab has an ID before trying to send a message
+  if (tab.id) {
+    console.log(
+      `Background script: Sending 'togglePanel' message to tab ${tab.id}`
+    );
+    chrome.tabs.sendMessage(tab.id, { action: "togglePanel" }, (response) => {
+      if (chrome.runtime.lastError) {
+        console.error(
+          `Background script: Error sending togglePanel message to tab ${tab.id}:`,
+          chrome.runtime.lastError.message
+        );
+      } else {
+        console.log(
+          `Background script: Received response from content script in tab ${tab.id}:`,
+          response
+        );
+      }
+    });
+  } else {
+    console.warn("Background script: Clicked tab has no ID.");
+  }
+});
 
 // TODO: Add listeners for browser actions, messages, etc.
 // TODO: Implement core background logic here

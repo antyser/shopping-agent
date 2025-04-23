@@ -9,6 +9,7 @@
     "moduleDetection": "force", // Treat files as modules without imports/exports
     "isolatedModules": true, // Ensure files can be safely transpiled without relying on other imports
     "moduleResolution": "node", // Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6).
+    "jsx": "react-jsx", // Add this line to enable JSX support for React 17+
 
     /* Strictness */
     "strict": true, // Enable all strict type-checking options
