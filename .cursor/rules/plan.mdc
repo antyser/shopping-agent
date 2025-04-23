@@ -61,10 +61,10 @@ Phase 1: Authentication Implementation (Est. 2-3 days)
 - [X] Task 1.6 (Firestore): Define initial security rules allowing authenticated users to potentially write data (placeholder for events later). Test rules.
 - [ ] Task 1.7 (Mock API): (Optional) Update mock endpoint (/authCheck?) to expect Authorization: Bearer <ID_TOKEN> header and log its presence/decode it (no strict validation needed for MVP).
 Phase 2: Core Features - Insights & Chat (Mocked) (Est. 3-4 days)
-- [ ] Task 2.1 (Insights - Content): Implement logic in content/index.js to detect Amazon product pages (URL matching).
-- [ ] Task 2.2 (Insights - Communication): Send message from content script to background script containing product identifier/URL.
-- [ ] Task 2.3 (Insights - Background): In background/api.js, create function to call mock /insights endpoint. Retrieve user ID token (if logged in) and pass it in the header.
-- [ ] Task 2.4 (Insights - Background): Handle message from content script, call the API function, receive mock response.
+- [X] Task 2.1 (Insights - Content): Implement logic in content/index.js to detect Amazon product pages (URL matching).
+- [X] Task 2.2 (Insights - Communication): Send message from content script to background script containing product URL.
+- [x] Task 2.3 (Insights - Background): In background/api.js, create function to call mock /insights endpoint. Retrieve user ID token (if logged in) and pass it in the header.
+- [x] Task 2.4 (Insights - Background): Handle message from content script, call the API function, receive mock response.
 - [ ] Task 2.5 (Insights - UI): Decide on UI (popup or injected). Implement logic to display mock insights data received from background script. Update manifest.json permissions if needed (scripting, host permissions for API/Amazon).
 - [ ] Task 2.6 (Insights - Mock API): Implement /insights Cloud Function route to accept requests, log input (optional), and return hardcoded mock insight JSON. Deploy.
 - [ ] Task 2.7 (Chat - UI): Build chat interface in popup.html & popup.css (message list, input field, send button).
