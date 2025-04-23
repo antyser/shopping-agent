@@ -28,5 +28,5 @@ export function isAmazonProductPage(): boolean {
  */
 export function isSupportedPage(): boolean {
   // Add more checks here for other supported pages later
-  return isAmazonProductPage();
+  return true;
 }

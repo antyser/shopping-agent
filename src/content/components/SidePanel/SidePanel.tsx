@@ -10,10 +10,11 @@ const SidePanel: React.FC<PropsWithChildren<SidePanelProps>> = ({ isOpen, onClos
     // TODO: Apply styles based on data-view attribute from parent
     return (
         <div
+            className="text-gray-900 bg-white"
             style={{
                 position: 'fixed', top: 0, right: 0, width: '33%', maxWidth: '450px', height: '100vh',
-                background: '#1F2937', // Default background
-                color: 'white', // Default text color
+                // background: '#1F2937', // Removed
+                // color: 'white', // Removed
                 zIndex: 9999,
                 transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
                 transition: 'transform 0.3s ease-in-out',

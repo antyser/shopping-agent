@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../state/AuthProvider'; // Adjust path as needed
 // import { chromeApi } from '../../services/chromeApi'; // Removed unused import
+import { Button } from '../../../components/ui/button'; // Import Shadcn Button
+import { Input } from '../../../components/ui/input'; // Import Shadcn Input
+import AuthHeader from '../AuthHeader/AuthHeader'; // Import the new header
 
 // Define props for the component
 interface LoginFormProps {
@@ -52,96 +55,73 @@ const LoginForm: React.FC<LoginFormProps> = ({ onNavigateToSignup }) => {
         }
     }
 
+    // Get the icon URL
+    const iconUrl = chrome.runtime.getURL('assets/icon.png');
+
     return (
-        <div style={{ padding: '20px' }}>
-            <h2 style={{ color: '#D8B4FE', marginBottom: '20px' }}>Login</h2> {/* Added margin */}
+        <div className="p-5 flex flex-col items-center bg-white">
+            {/* Use the reusable header component with all required props */}
+            <AuthHeader 
+              title="Welcome Back"
+              subtitle="Sign in with your email"
+              iconSrc={iconUrl} 
+            />
 
-            {/* Google Login Button */}
-            <button
+            {/* Google Login Button - using Shadcn Button */}
+            <Button
+                variant="outline" // Style as an outline button
                 onClick={handleGoogleLogin}
-                disabled={loading} // Disable while any operation is loading
-                style={{
-                    width: '100%',
-                    padding: '10px',
-                    background: 'white',
-                    color: 'black',
-                    border: '1px solid #ccc',
-                    borderRadius: '4px',
-                    cursor: loading ? 'not-allowed' : 'pointer',
-                    marginBottom: '10px'
-                }}
+                disabled={loading}
+                className="w-full mb-4" // Added margin bottom
             >
+                {/* TODO: Add Google Icon */}
                 {loading ? 'Loading...' : 'Sign in with Google'}
-            </button>
+            </Button>
 
-            <p style={{ color: '#888', textAlign: 'center' }}>- OR -</p>
+            <div className="relative w-full flex items-center my-4">
+                <div className="flex-grow border-t border-gray-300"></div>
+                <span className="flex-shrink mx-4 text-gray-500 text-sm">OR</span>
+                <div className="flex-grow border-t border-gray-300"></div>
+            </div>
 
             {/* Email/Password Form */}
-            <form onSubmit={handleEmailLogin}>
-                <input
+            <form onSubmit={handleEmailLogin} className="w-full space-y-4">
+                <Input // Use Shadcn Input
                     type="email"
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     disabled={loading}
-                    style={{
-                        width: '100%',
-                        padding: '10px',
-                        marginBottom: '10px',
-                        boxSizing: 'border-box'
-                    }}
                 />
-                <input
+                <Input // Use Shadcn Input
                     type="password"
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     disabled={loading}
-                    style={{
-                        width: '100%',
-                        padding: '10px',
-                        marginBottom: '10px',
-                        boxSizing: 'border-box'
-                    }}
                 />
-                 {error && <p style={{ color: 'red', fontSize: '14px', marginBottom: '10px' }}>{error}</p>}
-                <button
+                 {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
+                
+                <Button // Use Shadcn Button
                     type="submit"
                     disabled={loading}
-                    style={{
-                        width: '100%',
-                        padding: '10px',
-                        background: '#8B5CF6',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: loading ? 'not-allowed' : 'pointer',
-                        marginBottom: '15px'
-                    }}
+                    className="w-full bg-[#8B5CF6] hover:bg-[#7c3aed]" // Example purple color
                 >
                     {loading ? 'Logging In...' : 'Sign In with Email'}
-                </button>
+                </Button>
             </form>
 
             {/* Navigation to Signup */}
-            <button
+            <Button
+                variant="link" // Use link variant
                 onClick={onNavigateToSignup}
                 disabled={loading}
-                style={{
-                    background: 'none',
-                    border: 'none',
-                    color: 'blue',
-                    textDecoration: 'underline',
-                    cursor: loading ? 'not-allowed' : 'pointer',
-                    padding: 0,
-                    width: '100%',
-                    textAlign: 'center'
-                }}
+                className="w-full mt-4 text-sm text-secondary"
             >
-                Don't have an account? Sign Up
-            </button>
+                Don't have an account? <span className="text-blue-600 font-semibold">Sign Up</span>
+            </Button>
         </div>
     );
 }

@@ -35,7 +35,28 @@
   },
   "web_accessible_resources": [
     {
-      "resources": [ "assets/icon.png" ],
+      "resources": [
+        "assets/icon.png",
+        "content.css",
+        "assets/fonts/San-Francisco-Pro-Display/SF-Pro-Display-Thin.otf",
+        "assets/fonts/San-Francisco-Pro-Display/SF-Pro-Display-ThinItalic.otf",
+        "assets/fonts/San-Francisco-Pro-Display/SF-Pro-Display-Ultralight.otf",
+        "assets/fonts/San-Francisco-Pro-Display/SF-Pro-Display-UltralightItalic.otf",
+        "assets/fonts/San-Francisco-Pro-Display/SF-Pro-Display-Light.otf",
+        "assets/fonts/San-Francisco-Pro-Display/SF-Pro-Display-LightItalic.otf",
+        "assets/fonts/San-Francisco-Pro-Display/SF-Pro-Display-Regular.otf",
+        "assets/fonts/San-Francisco-Pro-Display/SF-Pro-Display-RegularItalic.otf",
+        "assets/fonts/San-Francisco-Pro-Display/SF-Pro-Display-Medium.otf",
+        "assets/fonts/San-Francisco-Pro-Display/SF-Pro-Display-MediumItalic.otf",
+        "assets/fonts/San-Francisco-Pro-Display/SF-Pro-Display-Semibold.otf",
+        "assets/fonts/San-Francisco-Pro-Display/SF-Pro-Display-SemiboldItalic.otf",
+        "assets/fonts/San-Francisco-Pro-Display/SF-Pro-Display-Bold.otf",
+        "assets/fonts/San-Francisco-Pro-Display/SF-Pro-Display-BoldItalic.otf",
+        "assets/fonts/San-Francisco-Pro-Display/SF-Pro-Display-Heavy.otf",
+        "assets/fonts/San-Francisco-Pro-Display/SF-Pro-Display-HeavyItalic.otf",
+        "assets/fonts/San-Francisco-Pro-Display/SF-Pro-Display-Black.otf",
+        "assets/fonts/San-Francisco-Pro-Display/SF-Pro-Display-BlackItalic.otf"
+      ],
       "matches": [ "<all_urls>" ]
     }
   ]

@@ -1,7 +1,8 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
-import { isSupportedPage } from "./services/pageMatcher"; // Import the page check function
+import { isSupportedPage } from "./services/pageMatcher";
+import "../styles/globals.css";
 
 console.log("Content script loaded. React version.");
 
@@ -33,7 +34,15 @@ function mountReactApp() {
   shadowRoot.appendChild(reactRootElement);
   console.log("React root element created inside Shadow DOM.");
 
-  // 5. Mount the React App
+  // 5. Inject CSS link into Shadow DOM
+  const cssUrl = chrome.runtime.getURL('content.css');
+  const styleLink = document.createElement('link');
+  styleLink.rel = 'stylesheet';
+  styleLink.href = cssUrl;
+  shadowRoot.appendChild(styleLink);
+  console.log(`Linked CSS: ${cssUrl}`);
+
+  // 6. Mount the React App
   const root = createRoot(reactRootElement); // Use createRoot from react-dom/client
   root.render(
     <React.StrictMode>
@@ -52,9 +61,6 @@ function mountReactApp() {
 }
 
 // --- Main Execution Logic ---
-if (isSupportedPage()) { // Use the imported function
-  console.log("Supported page detected. Mounting React app...");
-  mountReactApp();
-} else {
-  console.log("Not a supported page. React app not mounted.");
-}
+// Always attempt to mount based on manifest matches, removing the isSupportedPage check
+console.log("Attempting to mount React app based on manifest matches...");
+mountReactApp();

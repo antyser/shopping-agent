@@ -2,6 +2,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const webpack = require("webpack");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
   mode: "development", // Switch to 'production' for production builds
@@ -28,12 +29,15 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: ["style-loader", "css-loader"], // Injects CSS into the DOM
+        use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader"],
       },
       // Add loaders for other asset types if needed (e.g., images, fonts)
     ],
   },
   plugins: [
+    new MiniCssExtractPlugin({
+      filename: "[name].css",
+    }),
     // Copies manifest.json and assets to the dist folder
     new CopyWebpackPlugin({
       patterns: [
