@@ -33,18 +33,17 @@ const InsightsView: React.FC = () => {
                     {/* Display name or fallback */}
                     <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 'normal' }}>{welcomeName}</h3>
                 </div>
-
                 {/* Logout Button */}
                 <button
                     onClick={logout}
                     style={{
-                        background: '#777', // Slightly lighter grey
+                        background: '#777',
                         color: 'white',
                         border: 'none',
-                        padding: '6px 12px', // Adjusted padding
+                        padding: '6px 12px',
                         borderRadius: '4px',
                         cursor: 'pointer',
-                        fontSize: '14px' // Added font size
+                        fontSize: '14px'
                     }}
                 >
                     Logout
@@ -67,4 +66,4 @@ const InsightsView: React.FC = () => {
     );
 }
 
-export default InsightsView; 
+export default InsightsView;
