@@ -3,6 +3,7 @@ import { useAuth } from '../../state/AuthProvider';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import { Label } from '../../../components/ui/label';
+import { GoogleSignInButton } from '../../../components/custom/GoogleSignInButton';
 import { Mail, Lock, Eye, EyeOff, User } from 'lucide-react';
 import AuthHeader from '../AuthHeader/AuthHeader';
 
@@ -19,7 +20,7 @@ function SignupForm({ onNavigateToLogin }: SignupFormProps) {
   const [message, setMessage] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
-  const { signupWithEmail } = useAuth();
+  const { signupWithEmail, signInWithGoogle } = useAuth();
 
   const handleSignup = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -40,6 +41,25 @@ function SignupForm({ onNavigateToLogin }: SignupFormProps) {
     } catch (err: any) {
         console.error("Signup failed:", err);
         setError(err.message || "Failed to create account.");
+    } finally {
+        setLoading(false);
+    }
+  };
+
+  const handleGoogleSignup = async () => {
+    setError(null);
+    setMessage(null);
+    setLoading(true);
+    console.log("Attempting Google Sign-In / Sign-Up...");
+    try {
+      if (!signInWithGoogle) {
+          throw new Error("Google Sign-In function not available from AuthProvider.");
+      }
+      await signInWithGoogle();
+      console.log("Google Sign-In successful (or initiated).");
+    } catch (err: any) {
+        console.error("Google Sign-in failed:", err);
+        setError(err.message || "Failed to sign in with Google.");
     } finally {
         setLoading(false);
     }
@@ -135,6 +155,20 @@ function SignupForm({ onNavigateToLogin }: SignupFormProps) {
           {loading ? 'Creating Account...' : 'Sign Up'}
         </Button>
       </form>
+
+      {!message && (
+        <div className="relative flex py-2 items-center w-full">
+          <div className="flex-grow border-t border-gray-300"></div>
+          <span className="flex-shrink mx-4 text-gray-500 text-xs font-medium">OR</span>
+          <div className="flex-grow border-t border-gray-300"></div>
+        </div>
+      )}
+
+      {!message && (
+        <div className="w-full">
+          <GoogleSignInButton onClick={handleGoogleSignup} disabled={loading} />
+        </div>
+      )}
 
       {!message && (
         <div className="text-center text-lg font-sans">

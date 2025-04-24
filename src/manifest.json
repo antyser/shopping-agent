@@ -36,7 +36,7 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "assets/icon.png",
+        "assets/*",
         "content.css",
         "assets/fonts/San-Francisco-Pro-Display/SF-Pro-Display-Thin.otf",
         "assets/fonts/San-Francisco-Pro-Display/SF-Pro-Display-ThinItalic.otf",

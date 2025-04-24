@@ -11,7 +11,7 @@ interface LoginFormProps {
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onNavigateToSignup }) => {
-    const { loginWithGoogle, loginWithEmail } = useAuth();
+    const { signInWithGoogle, loginWithEmail } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -40,7 +40,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onNavigateToSignup }) => {
         setError(null);
         setLoading(true); // Show loading potentially, though Google flow is external
         try {
-            await loginWithGoogle();
+            await signInWithGoogle();
             // Success is handled by background/storage listener
         } catch (err: any) {
             console.error("Google login failed:", err);

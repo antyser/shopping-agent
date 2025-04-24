@@ -20,7 +20,7 @@ interface AuthState {
 
 // Define the shape of the context value
 interface AuthContextValue extends AuthState {
-  loginWithGoogle: () => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   loginWithEmail: (email: string, pass: string) => Promise<void>;
   signupWithEmail: (email: string, pass: string, nickname: string | null) => Promise<void>;
   logout: () => Promise<void>;
@@ -129,7 +129,7 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
   }, []); // Empty dependency array ensures this runs only once on mount
 
   // --- Action Functions --- //
-  const loginWithGoogle = useCallback(async () => {
+  const signInWithGoogle = useCallback(async () => {
     console.log("AuthProvider: Requesting Google login...");
     try {
       // Use AuthActionResponse type for consistency
@@ -248,7 +248,7 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
   // Value provided to consuming components
   const value: AuthContextValue = {
     ...authState, // Spread all state fields including email
-    loginWithGoogle,
+    signInWithGoogle,
     loginWithEmail,
     signupWithEmail,
     logout,
