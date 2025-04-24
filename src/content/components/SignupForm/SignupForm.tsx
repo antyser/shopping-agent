@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../state/AuthProvider';
-import { Button } from '../../../components/ui/button';
-import { Input } from '../../../components/ui/input';
-import { Label } from '../../../components/ui/label';
-import { GoogleSignInButton } from '../../../components/custom/GoogleSignInButton';
+import { Button } from '../Shared/Button';
+import { Input } from '../Shared/Input';
+import { Label } from '../Shared/Label';
+import { GoogleSignInButton } from '../Shared/GoogleSignInButton';
 import { Mail, Lock, Eye, EyeOff, User } from 'lucide-react';
 import AuthHeader from '../AuthHeader/AuthHeader';
 
@@ -22,7 +22,7 @@ function SignupForm({ onNavigateToLogin }: SignupFormProps) {
 
   const { signupWithEmail, signInWithGoogle } = useAuth();
 
-  const handleSignup = async (event: React.FormEvent) => {
+  const handleSignup = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
     setMessage(null);
@@ -88,7 +88,7 @@ function SignupForm({ onNavigateToLogin }: SignupFormProps) {
               type="email"
               placeholder="Enter your email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
               required
               className="pl-10 bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0"
             />
@@ -106,7 +106,7 @@ function SignupForm({ onNavigateToLogin }: SignupFormProps) {
               type={showPassword ? 'text' : 'password'}
               placeholder="Password (min. 6 characters)"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
               required
               minLength={6}
               className="pl-10 pr-10 bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0"
@@ -133,7 +133,7 @@ function SignupForm({ onNavigateToLogin }: SignupFormProps) {
               type="text"
               placeholder="Nickname"
               value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNickname(e.target.value)}
               className="pl-10 bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0"
             />
           </div>

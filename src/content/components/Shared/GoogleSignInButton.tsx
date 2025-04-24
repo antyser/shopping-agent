@@ -1,13 +1,13 @@
 import React from 'react';
-import { Button, ButtonProps } from '../ui/button'; // Adjust path if needed
-import { cn } from '../../lib/utils'; // Adjust path if needed
+import { Button, type ButtonProps } from './Button'; // Updated path
+import { cn } from '../../../lib/utils'; // Updated path
 
 interface GoogleSignInButtonProps extends Omit<ButtonProps, 'variant' | 'size' | 'children'> {
   // You can add specific props for this button if needed later
 }
 
 // Load the Google icon URL securely using chrome.runtime.getURL
-// IMPORTANT: Ensure 'assets/google.png' is listed under 'web_accessible_resources' 
+// IMPORTANT: Ensure 'assets/google.png' is listed under 'web_accessible_resources'
 // in your manifest.json
 let googleIconUrl = '';
 try {

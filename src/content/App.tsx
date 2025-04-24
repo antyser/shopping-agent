@@ -6,16 +6,23 @@ import FloatingActionButton from './components/FloatingActionButton/FloatingActi
 import SidePanel from './components/SidePanel/SidePanel';
 import LoginForm from './components/LoginForm/LoginForm';
 import SignupForm from './components/SignupForm/SignupForm';
-import InsightsView from './components/InsightsView/InsightsView';
+import MainView from './components/MainView';
 import VerifyEmailView from './components/VerifyEmailView/VerifyEmailView';
 
 // Define possible view states within the panel (when not logged in or verifying)
 type AuthView = 'login' | 'signup';
 
 // Main App content component
-function AppContent() {
-    // Get full auth state including verification status
-    const { isLoggedIn, emailVerified } = useAuth();
+function SidePanelContainer() {
+    // Get full auth state including verification status and error
+    const { 
+        isLoggedIn, 
+        emailVerified, 
+        error: authError,
+        displayName, // Get user data
+        photoURL,    // Get user data
+        email        // Get user data
+    } = useAuth();
     const [isPanelOpen, setIsPanelOpen] = React.useState(false);
     // State to manage which auth view (login/signup) is shown when logged out
     const [currentAuthView, setCurrentAuthView] = React.useState<AuthView>('login');
@@ -65,11 +72,22 @@ function AppContent() {
             return <div style={{ padding: '20px', textAlign: 'center' }}>Loading Authentication...</div>;
         }
 
+        // Handle potential auth errors first
+        if (authError) {
+            return <div style={{ padding: '20px', color: 'red', textAlign: 'center' }}>Error: {authError}</div>;
+        }
+
         // 2. Logged In state
         if (isLoggedIn === true) {
             // Check verification status
             if (emailVerified === true) {
-                return <InsightsView />;
+                 // Prepare userData prop
+                 const userData = {
+                    displayName,
+                    photoURL,
+                    email
+                };
+                return <MainView userData={userData} />; // Pass userData
             } else {
                 // User is logged in but email is not verified (or status unknown yet)
                 return <VerifyEmailView />;
@@ -107,7 +125,7 @@ function App() {
     console.log("Rendering main App component with AuthProvider...");
     return (
         <AuthProvider>
-            <AppContent />
+            <SidePanelContainer />
         </AuthProvider>
     );
 }

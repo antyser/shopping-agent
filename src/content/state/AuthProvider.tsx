@@ -25,6 +25,7 @@ interface AuthContextValue extends AuthState {
   signupWithEmail: (email: string, pass: string, nickname: string | null) => Promise<void>;
   logout: () => Promise<void>;
   resendVerificationEmail: () => Promise<void>; // Task 6.1: Add resend function type
+  error: string | null; // Add error state
 }
 
 // Define common response type for background messages
@@ -48,6 +49,7 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
     emailVerified: null, // Initialize emailVerified
     email: null, // Task 3.2: Initialize email
   });
+  const [error, setError] = useState<string | null>(null); // Add error state management
 
   // Effect to load initial state and set up listener
   useEffect(() => {
@@ -56,6 +58,7 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
     // Function to load state from storage
     const loadInitialState = async () => {
       console.log("AuthProvider: Loading initial auth state including email...");
+      setError(null); // Clear error on load
       try {
         // Task 3.2: Load email from storage
         const result = await chromeApi.getStorageLocal([
@@ -81,6 +84,7 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
         console.error("AuthProvider: Error loading initial state:", error);
         if (isMounted) {
             // Reset all fields on error
+            setError("Failed to load initial authentication state."); // Set error on load failure
             setAuthState({ isLoggedIn: false, userId: null, displayName: null, photoURL: null, emailVerified: null, email: null });
         }
       }
@@ -131,6 +135,7 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
   // --- Action Functions --- //
   const signInWithGoogle = useCallback(async () => {
     console.log("AuthProvider: Requesting Google login...");
+    setError(null); // Clear previous errors
     try {
       // Use AuthActionResponse type for consistency
       const response = await chromeApi.sendMessage({ action: "loginWithGoogle" }) as AuthActionResponse;
@@ -142,14 +147,16 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
     } catch (error) {
       console.error("AuthProvider: Error during Google login flow:", error);
       // Re-throw error for component handling
-       if (error instanceof Error) throw error;
-       throw new Error(String(error) || "An unknown Google login error occurred.");
+      const errorMessage = error instanceof Error ? error.message : String(error) || "An unknown Google login error occurred.";
+      setError(errorMessage); // Set error state
+      throw new Error(errorMessage); // Re-throw after setting state
     }
   }, []);
 
   // Task 3.1: Implement Email/Password Login Function
   const loginWithEmail = useCallback(async (email: string, pass: string) => {
     console.log("AuthProvider: Requesting Email login...");
+    setError(null); // Clear previous errors
     try {
       const response = await chromeApi.sendMessage({
           action: "loginWithEmail",
@@ -166,8 +173,9 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
     } catch (error) {
       console.error("AuthProvider: Error during Email login:", error);
       // Re-throw error for component handling
-       if (error instanceof Error) throw error;
-       throw new Error(String(error) || "An unknown email login error occurred.");
+      const errorMessage = error instanceof Error ? error.message : String(error) || "An unknown email login error occurred.";
+      setError(errorMessage); // Set error state
+      throw new Error(errorMessage); // Re-throw after setting state
     }
   }, []);
 
@@ -181,6 +189,7 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
   // Added signup function
   const signupWithEmail = useCallback(async (email: string, pass: string, nickname: string | null) => {
       console.log("AuthProvider: Requesting Email signup...");
+      setError(null); // Clear previous errors
       try {
           const response = await chromeApi.sendMessage({
               action: "signupWithEmail",
@@ -197,16 +206,15 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
           // Signup successful - onAuthStateChanged listener will handle state update
       } catch (error) {
           console.error("AuthProvider: Error sending signup message or processing response:", error);
-          if (error instanceof Error) {
-              throw error;
-          } else {
-              throw new Error(String(error) || "An unknown signup error occurred.");
-          }
+          const errorMessage = error instanceof Error ? error.message : String(error) || "An unknown signup error occurred.";
+          setError(errorMessage); // Set error state
+          throw new Error(errorMessage); // Re-throw after setting state
       }
   }, []);
 
   const logout = useCallback(async () => {
     console.log("AuthProvider: Requesting logout...");
+    setError(null); // Clear errors on logout attempt
     try {
       const response = await chromeApi.sendMessage({ action: "logout" }) as AuthActionResponse;
       console.log("AuthProvider: Logout message sent. Response:", response);
@@ -217,13 +225,15 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
       // State update will happen via storage listener from onAuthStateChanged
     } catch (error) {
         console.error("AuthProvider: Error sending logout message:", error);
-        // Don't necessarily throw, allow UI to proceed if needed
+        // Set error state, but don't necessarily throw
+        setError(error instanceof Error ? error.message : String(error) || "Failed to send logout request.");
     }
   }, []);
 
   // Task 6.1: Add resendVerificationEmail function
   const resendVerificationEmail = useCallback(async () => {
     console.log("AuthProvider: Requesting resend verification email...");
+    setError(null); // Clear previous errors
     try {
       const response = await chromeApi.sendMessage({
         action: "resendVerificationEmail"
@@ -237,11 +247,9 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
       // Success message can be handled in the component calling this
     } catch (error) {
       console.error("AuthProvider: Error sending resend email message:", error);
-      if (error instanceof Error) {
-        throw error;
-      } else {
-        throw new Error(String(error) || "An unknown error occurred while resending email.");
-      }
+      const errorMessage = error instanceof Error ? error.message : String(error) || "An unknown error occurred while resending email.";
+      setError(errorMessage); // Set error state
+      throw new Error(errorMessage); // Re-throw after setting state
     }
   }, []);
 
@@ -252,13 +260,14 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
     loginWithEmail,
     signupWithEmail,
     logout,
-    resendVerificationEmail, // Task 6.1: Add to context value
+    resendVerificationEmail, // Task 6.1: Provide function
+    error, // Provide error state
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-// Custom hook to easily consume the context
+// Custom hook to use the auth context
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {

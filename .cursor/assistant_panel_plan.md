@@ -186,8 +186,8 @@ This task list outlines the steps to build the side panel UI based on the plan a
 - [ ] **1. Tailwind Configuration (`globals.css`)**: 
     - [ ] Define custom colors, fonts, and theme extensions based on the design mock (if not already done).
     - [ ] Ensure Tailwind directives are correctly included and linked in the shadow DOM (`src/content/index.tsx`).
-- [ ] **2. Directory Structure**: Create the *remaining* component directories and empty files for the *authenticated view* (`components/MainView`, `components/HeaderSection`, `components/ProductInfo`, `components/Chat`, `components/Shared`, etc.).
-- [ ] **3. Refactor/Implement `App.tsx` (as `SidePanelContainer`)**: 
+- [X] **2. Directory Structure**: Create the *remaining* component directories and empty files for the *authenticated view* (`components/MainView`, `components/HeaderSection`, `components/ProductInfo`, `components/Chat`, `components/Shared`, etc.).
+- [X] **3. Refactor/Implement `App.tsx` (as `SidePanelContainer`)**: 
     - [ ] Modify `src/content/App.tsx` to act as the central controller.
     - [ ] **Integrate `useAuth`**: Utilize the existing `useAuth` hook.
     - [ ] **Manage View State**: Implement state (`useState`) to track the current view (`'login'`, `'signup'`, `'verify'`, `'main'`).
@@ -220,10 +220,10 @@ This task list outlines the steps to build the side panel UI based on the plan a
     - [ ] Implement `ReviewsRatingsSection.tsx` (Placeholder).
 - [ ] **10. Build Product Info Sections**: 
     - [ ] Implement `AboutProductSection.tsx`, `SuitabilitySection.tsx`, `SimilarProductsSection.tsx` using static content.
-- [ ] **11. Build Chat Display**: 
+- [x] **11. Build Chat Display**: 
     - [ ] Implement `MessageDisplay.tsx` to map `messages` prop to `<Message />` components.
     - [ ] Implement `Message.tsx` for individual message bubbles.
-- [ ] **12. Develop Shared Components**: 
+- [x] **12. Develop Shared Components**: 
     - [ ] Create reusable components (`Avatar`, `Button`, `Tag`, etc.) in `components/Shared/` as needed.
 
 **Phase 3: Integration & Functionality**

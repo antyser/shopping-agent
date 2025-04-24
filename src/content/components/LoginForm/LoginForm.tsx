@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../state/AuthProvider'; // Adjust path as needed
-// import { chromeApi } from '../../services/chromeApi'; // Removed unused import
-import { Button } from '../../../components/ui/button'; // Import Shadcn Button
-import { Input } from '../../../components/ui/input'; // Import Shadcn Input
-import AuthHeader from '../AuthHeader/AuthHeader'; // Import the new header
+import { useAuth } from '../../state/AuthProvider';
+import { Button } from '../Shared/Button'; // Import Shared Button
+import { Input } from '../Shared/Input'; // Import Shared Input
+import AuthHeader from '../AuthHeader/AuthHeader';
 
 // Define props for the component
 interface LoginFormProps {
@@ -17,7 +16,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onNavigateToSignup }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const handleEmailLogin = async (event: React.FormEvent) => {
+    const handleEmailLogin = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault(); // Prevent default form submission
         setError(null); // Clear previous errors
         setLoading(true);
@@ -90,7 +89,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onNavigateToSignup }) => {
                     type="email"
                     placeholder="Enter your email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                     required
                     disabled={loading}
                 />
@@ -98,7 +97,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onNavigateToSignup }) => {
                     type="password"
                     placeholder="Password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                     required
                     disabled={loading}
                 />
