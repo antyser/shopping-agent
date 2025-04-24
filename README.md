@@ -54,7 +54,6 @@ shopping-agent/
 ├── package-lock.json     # NPM lock file
 ├── postcss.config.js     # PostCSS configuration
 ├── README.md             # This file
-├── tailwind.config.js    # Tailwind CSS configuration
 ├── tsconfig.json         # TypeScript configuration
 ├── webpack.config.js     # Webpack configuration
 └── yarn.lock             # Yarn lock file

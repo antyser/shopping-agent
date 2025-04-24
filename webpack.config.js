@@ -29,7 +29,21 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader"],
+        use: [
+          MiniCssExtractPlugin.loader,
+          "css-loader",
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                plugins: [
+                  require("@tailwindcss/postcss"), // Use the v4 plugin
+                  require("autoprefixer"), // Keep autoprefixer if still desired
+                ],
+              },
+            },
+          },
+        ],
       },
       // Add loaders for other asset types if needed (e.g., images, fonts)
     ],

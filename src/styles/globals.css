@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-@import "tailwindcss";
 
+/* 2. Define @font-face rules for custom fonts (can be before or after @import "tailwindcss") */
 /* SF Pro Text Font Definitions */
 @font-face {
   font-family: 'SF Pro Text';
@@ -118,18 +118,33 @@
   font-weight: 900;
   font-style: italic;
 }
-/* End SF Pro Text */
 
-@layer base {
-  :root {
-    --text-primary: 20 7 34; /* #140722 */
-    --text-secondary: 101 104 108; /* #65686C */
-  }
+/* 3. Import Tailwind CSS (SHOULD COME AFTER EXTERNAL IMPORTS AND FONT-FACE, BEFORE @theme and @layer) */
+@import "tailwindcss";
+
+/* 4. Define your custom theme variables using the @theme directive */
+@theme {
+  /* Custom Colors */
+  --color-primary: #140722;
+  --color-secondary: #65686C;
+  --color-primary-text-color: #050505;
+  --color-icon-tertiary: #594173;
+  --color-border-primary: #EAE7EE;
+  --color-primary-button: #8C55FF;
+  --color-bg-secondary: #FFFFFF;
+  --color-secondary-text-color: #65686C;
+  --color-pink-500: #FF4AA1;
+  --color-text-primary: #140722;
+  --color-primary-500: #6F2BFF;
+  --color-general-white: #FFFFFF;
+  --color-divider: #C9CCD1;
+  --color-input-bg: #F7F4FA;
+  --color-gradient-light-purple: #BD9DFF;
+  --color-gradient-light-pink: #FFC7E2;
+  --color-gray-subtle: #D9D9D9;
+
+  /* Custom Font Families for Tailwind utilities */
+  --font-sans: "SF Pro Text", system-ui, sans-serif; /* Default sans font */
+  --font-poppins: "Poppins", sans-serif; /* Custom poppins utility */
+  /* You can add other custom font utilities here, e.g., --font-heading: "SF Pro Text", sans-serif; */
 }
-
-/* Custom utility classes */
-.flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-} 

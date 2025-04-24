@@ -19,10 +19,10 @@ function AuthHeader({ title, subtitle, iconSrc }: AuthHeaderProps) {
       </div>
       {/* Text Content */}
       <div className="self-stretch flex flex-col justify-start items-start gap-2">
-        <div className="self-stretch text-center text-figma-text-primary text-3xl font-bold font-sans leading-10">
+        <div className="self-stretch text-center text-primary text-3xl font-bold font-sans leading-10">
           {title}
         </div>
-        <div className="self-stretch text-center text-figma-secondary-text-color text-base font-semibold font-sans leading-normal">
+        <div className="self-stretch text-center text-secondary text-base font-semibold font-sans leading-normal">
           {subtitle}
         </div>
       </div>

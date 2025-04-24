@@ -12,7 +12,7 @@ const SidePanel: React.FC<PropsWithChildren<SidePanelProps>> = ({ isOpen, onClos
         <div
             className="text-gray-900 bg-white"
             style={{
-                position: 'fixed', top: 0, right: 0, width: '33%', maxWidth: '450px', height: '100vh',
+                position: 'fixed', top: 0, right: 0, width: '33%', height: '100vh',
                 // background: '#1F2937', // Removed
                 // color: 'white', // Removed
                 zIndex: 9999,
