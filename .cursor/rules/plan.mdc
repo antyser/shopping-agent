@@ -1,7 +1,7 @@
 ---
 description: 
 globs: 
-alwaysApply: true
+alwaysApply: false
 ---
 We built an AI shopping assistant in chrome extension format to give user insight while browsing ecommerce sites (only Amazon for now). 
 Goal
