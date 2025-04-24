@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 
 // Import section components (placeholders for now)
 import HeaderSection from './HeaderSection/HeaderSection';
@@ -29,18 +29,33 @@ interface ScrollableContentProps {
 }
 
 function ScrollableContent({ userData, messages }: ScrollableContentProps) {
+	// Ref for the scrollable container
+	const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+	// Effect to scroll to top on mount
+	useEffect(() => {
+		if (scrollContainerRef.current) {
+			scrollContainerRef.current.scrollTop = 0;
+		}
+	}, []); // Empty dependency array ensures this runs only once on mount
+
 	return (
-		<div className="flex-grow overflow-y-auto p-4 space-y-6 bg-background-color">
-			{/* Pass userData down */}
+		// Attach the ref to the scrollable div - No padding on main container
+		<div ref={scrollContainerRef} className="flex-grow overflow-y-auto bg-background-color">
+			{/* Header at full width with no extra padding */}
 			<HeaderSection userData={userData} />
-			<SubNavigationSection />
-			{/* TODO: Pass productContext down to these sections later */}
-			<AboutProductSection />
-			<ReviewsRatingsSection />
-			<SuitabilitySection />
-			<SimilarProductsSection />
-			{/* Pass messages down */}
-			<MessageDisplay messages={messages} />
+			
+			{/* Content sections with consistent padding */}
+			<div className="px-4">
+				<SubNavigationSection />
+				{/* TODO: Pass productContext down to these sections later */}
+				<AboutProductSection />
+				<ReviewsRatingsSection />
+				<SuitabilitySection />
+				<SimilarProductsSection />
+				{/* Pass messages down */}
+				<MessageDisplay messages={messages} />
+			</div>
 		</div>
 	);
 }

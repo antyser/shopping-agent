@@ -24,14 +24,7 @@ const SidePanel: React.FC<PropsWithChildren<SidePanelProps>> = ({ isOpen, onClos
             }}
             aria-hidden={!isOpen} // Accessibility
         >
-            <button
-                onClick={onClose}
-                style={{ position: 'absolute', top: '10px', right: '10px', background: 'none', border: 'none', color: 'inherit', fontSize: '20px', cursor: 'pointer', zIndex: 10 }}
-                aria-label="Close Panel"
-            >
-                &times;
-            </button>
-            <div style={{ padding: '20px' }}> {/* Inner container for padding */} 
+            <div>
                  {children}
             </div>
         </div>

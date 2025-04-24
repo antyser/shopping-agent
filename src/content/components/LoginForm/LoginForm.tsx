@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../state/AuthProvider';
-import { Button } from '../Shared/Button'; // Import Shared Button
-import { Input } from '../Shared/Input'; // Import Shared Input
+import { Button } from '../Shared/Button';
+import { Input } from '../Shared/Input';
 import AuthHeader from '../AuthHeader/AuthHeader';
 
 // Define props for the component

@@ -13,15 +13,21 @@ interface HeaderProps {
 }
 
 function Header({ userData }: HeaderProps) {
+	const iconUrl = chrome.runtime.getURL('assets/logo.png');
+
 	return (
-		<div className="flex items-center gap-2">
-			<Avatar src={userData.photoURL} alt={userData.displayName || 'User'} />
-			<div>
-				<p className="text-sm font-medium text-gray-800">
-					{userData.displayName || 'Welcome!'}
-				</p>
-				{/* Optional: Add subtitle or email if needed */}
-				{/* <p className="text-xs text-gray-500">Have a nice day</p> */}
+		<div className="flex items-center">
+			<div className="pl-[16px] flex items-center">
+				<img
+					src={iconUrl}
+					alt="Logo"
+					className="w-8 h-8 left-[16px] top-[16px] absolute"
+				/>
+			</div>
+			<div className="ml-[12px]">
+				<span className="text-primary-text-color text-base font-semibold leading-relaxed">
+					Hi {userData.displayName ? `${userData.displayName}` : 'there'}, welcome!
+				</span>
 			</div>
 		</div>
 	);

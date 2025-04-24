@@ -124,27 +124,43 @@
 
 /* 4. Define your custom theme variables using the @theme directive */
 @theme {
-  /* Custom Colors */
-  --color-primary: #140722;
-  --color-secondary: #65686C;
-  --color-primary-text-color: #050505;
-  --color-icon-tertiary: #594173;
-  --color-border-primary: #EAE7EE;
-  --color-primary-button: #8C55FF;
-  --color-bg-secondary: #FFFFFF;
-  --color-secondary-text-color: #65686C;
-  --color-pink-500: #FF4AA1;
-  --color-text-primary: #140722;
-  --color-primary-500: #6F2BFF;
-  --color-general-white: #FFFFFF;
-  --color-divider: #C9CCD1;
-  --color-input-bg: #F7F4FA;
-  --color-gradient-light-purple: #BD9DFF;
-  --color-gradient-light-pink: #FFC7E2;
-  --color-gray-subtle: #D9D9D9;
+  /* Custom Colors - Updated from Figma */
+  --color-primary-text-color: #050505; /* Primary text color */
+  --color-secondary-text-color: #65686C; /* Secondary text color */
+  --color-border-primary: #EAE7EE; /* Border/border-primary, Button border */
+  --color-button-border: #EAE7EE; /* Explicitly Button border (same as border-primary) */
+  --color-bg-secondary: #FFFFFF; /* Background/bg-secondary */
+  --color-rating: #FFB74A; /* rating */
+  --color-icon-secondary: #2B0F49; /* Icon/secondary */
+  --color-primary-button: #8C55FF; /* Primary button */
+  --color-input-bg: #F7F4FA; /* Input bg */
+  --color-primary-500: #6F2BFF; /* Primary/500, Button/primary */
+  --color-divider: #C9CCD1; /* Divider */
+  --color-text-primary: #140722; /* Text/primary */
+  /* --color-button-primary is the same as --color-primary-500 */
+  --color-primary-50: #F1EAFF; /* Primary/50, Background/bg-primary-hover */
+  --color-bg-primary-hover: #F1EAFF; /* Explicitly Background/bg-primary-hover (same as primary-50) */
+  --color-badge-pink: #FF4AA1; /* Badge/pink */
+  --color-general-white: #FFFFFF; /* General/White, Grays/White, White */
+  --color-brand-60: #7C3AED; /* Brand/60 */
+  --color-gray-80: #1F2937; /* Gray/80 */
+  --color-grays-white: #FFFFFF; /* Explicitly Grays/White (same as general-white) */
+  --color-white: #FFFFFF; /* Explicitly White (same as general-white) */
+
+  /* --- Keep existing custom names if they don't conflict --- */
+  --color-primary: #140722; /* Existing - same as text-primary */
+  --color-secondary: #65686C; /* Existing - same as secondary-text-color */
+  --color-icon-tertiary: #594173; /* Existing */
+  --color-pink-500: #FF4AA1; /* Existing - same as badge-pink */
+  --color-gradient-light-purple: #BD9DFF; /* Existing */
+  --color-gradient-light-pink: #FFC7E2; /* Existing */
+  --color-gray-subtle: #D9D9D9; /* Existing */
+  /* --- Add any missing colors from mock manually if needed --- */
+  --color-teal-500: #14B8A6; /* Added from mock requirement - replace if needed */
 
   /* Custom Font Families for Tailwind utilities */
   --font-sans: "SF Pro Text", system-ui, sans-serif; /* Default sans font */
+  --font-inter: "Inter", sans-serif; /* Added for Inter font usage */
   --font-poppins: "Poppins", sans-serif; /* Custom poppins utility */
   /* You can add other custom font utilities here, e.g., --font-heading: "SF Pro Text", sans-serif; */
 }
