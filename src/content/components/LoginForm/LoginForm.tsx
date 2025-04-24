@@ -56,7 +56,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onNavigateToSignup }) => {
     }
 
     // Get the icon URL
-    const iconUrl = chrome.runtime.getURL('assets/icon.png');
+    const iconUrl = chrome.runtime.getURL('assets/logo.png');
 
     return (
         <div className="p-5 flex flex-col items-center bg-white">

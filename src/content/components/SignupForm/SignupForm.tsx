@@ -66,14 +66,14 @@ function SignupForm({ onNavigateToLogin }: SignupFormProps) {
   };
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
-  const iconUrl = chrome.runtime.getURL('assets/icon.png');
+  const logoUrl = chrome.runtime.getURL('assets/logo.png');
 
   return (
     <div className="p-5 flex flex-col items-center bg-white space-y-6">
       <AuthHeader 
         title="Welcome"
         subtitle="Sign up with your email"
-        iconSrc={iconUrl}
+        iconSrc={logoUrl}
       />
 
       <form onSubmit={handleSignup} className="w-full space-y-6">

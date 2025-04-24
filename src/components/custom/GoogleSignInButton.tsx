@@ -42,6 +42,7 @@ const GoogleSignInButton = React.forwardRef<HTMLButtonElement, GoogleSignInButto
           "text-slate-700", // Mapped text color - ADJUST if needed
           "hover:text-slate-900", // Default hover from 'outline' variant
           "font-poppins font-medium", // Use Poppins font, medium weight
+          "border-Border-border-primary", // Explicitly set the border color
           // Add specific border color override if 'border-Border-border-primary' != 'border-slate-200'
           // e.g., "border-my-custom-border-color"
           className // Allow external class overrides
