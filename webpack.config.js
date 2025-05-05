@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const Dotenv = require("dotenv-webpack");
 
 module.exports = {
   mode: "development", // Switch to 'production' for production builds
@@ -66,6 +67,10 @@ module.exports = {
       ),
       // Add other environment variables here, e.g., Firebase config
       // 'process.env.FIREBASE_API_KEY': JSON.stringify(process.env.FIREBASE_API_KEY),
+    }),
+    new Dotenv({
+      path: "./.env",
+      systemvars: true,
     }),
   ],
 };

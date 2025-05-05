@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ScrollableContent from './ScrollableContent'; // Placeholder import
 import ChatInputSection from './ChatInputSection'; // Placeholder import
+import HeaderSection from './HeaderSection/HeaderSection';
 
 // Define the structure for user data passed as props
 interface UserData {
@@ -45,11 +46,18 @@ function MainView({ userData }: MainViewProps) {
 
 	return (
 		<div className="flex flex-col h-full bg-background-color">
-			{/* Scrollable content area */}
-			<ScrollableContent userData={userData} messages={messages} />
+			{/* Render HeaderSection here */}
+			<HeaderSection userData={userData} />
 
-			{/* Fixed chat input area */}
-			<ChatInputSection handleSendMessage={handleSendMessage} />
+			{/* Scrollable content area - make it grow */}
+			<div className="flex-1 overflow-y-auto">
+				<ScrollableContent userData={userData} messages={messages} />
+			</div>
+
+			{/* Fixed chat input area - prevent it from shrinking */}
+			<div className="flex-shrink-0">
+				<ChatInputSection handleSendMessage={handleSendMessage} />
+			</div>
 		</div>
 	);
 }

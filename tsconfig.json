@@ -25,10 +25,10 @@
     "lib": ["es2017", "dom", "dom.iterable"],
 
     /* Path Aliases (Optional - Example) */
-    // "baseUrl": "./src",
-    // "paths": {
-    //   "@shared/*": ["shared/*"]
-    // }
+    "baseUrl": "./src",
+    "paths": {
+      "@shared/*": ["shared/*"]
+    }
   },
   "include": ["src/**/*", "functions/**/*"], // Which files TypeScript should check
   "exclude": ["node_modules", "dist"] // Which files to ignore

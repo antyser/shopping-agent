@@ -15,7 +15,7 @@ Tech stack
 - Frontend (Chrome Extension):
   - Language: Typescript (ES6+)
   - Markup/Styling: HTML5, CSS3
-  - Framework: Vanilla JavaScript (Recommended for MVP simplicity, but React/Vue/Svelte are options for UI components if preferred)
+  - Framework: React 
   - Build Tool: Webpack (Recommended for bundling modules, managing assets, environment variables) or Parcel/Vite
   - APIs: Chrome Extension APIs (Manifest V3: Service Worker, chrome.runtime, chrome.storage, chrome.tabs, chrome.identity, chrome.scripting)
 - Backend & Infrastructure:

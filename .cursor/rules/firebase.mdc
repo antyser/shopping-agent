@@ -27,10 +27,6 @@ shopping-agent/
 │   │   ├── index.js        # Main content script entry point
 │   │   ├── uiInjector.js   # Logic for injecting UI elements (optional)
 │   │   └── eventListeners.js # Page interaction listeners (scroll, etc.)
-│   ├── popup/              # Extension popup UI
-│   │   ├── popup.html
-│   │   ├── popup.css
-│   │   └── popup.js        # Popup logic (login, chat UI, interaction)
 │   ├── shared/             # Shared utilities and constants
 │   │   ├── constants.js    # Event types, storage keys, etc.
 │   │   └── utils.js        # Helper functions (throttling, etc.)

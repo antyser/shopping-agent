@@ -11,7 +11,6 @@ import {
   signInWithEmail,
   resendVerificationEmailHandler,
 } from "./auth";
-import { fetchProductInsights } from "./api";
 
 console.log("Background script started.");
 console.log("Firebase Auth service:", auth);
@@ -237,44 +236,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // Indicate async response
   }
 
-  // --- Messages typically from Content Script ---
-  if (message.type === "PRODUCT_PAGE_DETECTED" && message.url) {
-    console.log(
-      `Handling 'PRODUCT_PAGE_DETECTED': ${message.url}. Fetching insights and auth status...`
-    );
-    chrome.storage.local.get(["isLoggedIn", "userId"], async (storage) => {
-      const isLoggedIn = storage.isLoggedIn === true;
-      const userId = storage.userId || null;
-      console.log("Current auth status from storage:", { isLoggedIn, userId });
-      if (!isLoggedIn) {
-        console.log("User not logged in. Sending response without insights.");
-        sendResponse({ success: true, isLoggedIn: false, userId: null });
-        return;
-      }
-      try {
-        const insights = await fetchProductInsights(message.url);
-        console.log("Sending insights back to content script:", insights);
-        sendResponse({
-          success: true,
-          isLoggedIn: true,
-          userId: userId,
-          data: insights,
-        });
-      } catch (error: Error | unknown) {
-        console.error("Error fetching insights:", error);
-        const errorMessage =
-          error instanceof Error ? error.message : "Failed to fetch insights";
-        sendResponse({
-          success: false,
-          isLoggedIn: true,
-          userId: userId,
-          error: errorMessage,
-        });
-      }
-    });
-    return true;
-  }
-
   // --- Default handling for unrecognised messages ---
   console.log(
     "Unified Message Listener: Unhandled message type/action:",
@@ -314,3 +275,5 @@ chrome.action.onClicked.addListener((tab) => {
 
 // TODO: Add listeners for browser actions, messages, etc.
 // TODO: Implement core background logic here
+
+console.log("Shopping Agent background script loaded.");

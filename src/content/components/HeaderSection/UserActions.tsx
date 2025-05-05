@@ -28,6 +28,21 @@ function UserActions({ userData }: UserActionsProps) {
 		return name ? name.charAt(0).toUpperCase() : '?';
 	}
 
+	// Logout handler
+	const handleLogout = async () => {
+		console.log("Logout button clicked in UserActions");
+		if (logout) {
+			try {
+				await logout();
+				console.log("Logout successful (triggered from UserActions)");
+			} catch (error) {
+				console.error("Error during logout:", error);
+			}
+		} else {
+			console.error("Logout function not available from useAuth");
+		}
+	};
+
 	return (
 		<div className="flex items-center gap-3.5">
 			{/* Notification Bell */}
@@ -52,6 +67,14 @@ function UserActions({ userData }: UserActionsProps) {
 					{getInitials(userData.displayName)}
 				</AvatarFallback>
 			</Avatar>
+
+			{/* Logout Button */}
+			<button
+				onClick={handleLogout}
+				className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm whitespace-nowrap"
+			>
+				Logout
+			</button>
 		</div>
 	)
 }

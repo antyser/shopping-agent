@@ -1,9 +1,8 @@
 import React, { useRef, useEffect } from 'react';
 
 // Import section components (placeholders for now)
-import HeaderSection from './HeaderSection/HeaderSection';
 import SubNavigationSection from './SubNavigation/SubNavigationSection';
-import AboutProductSection from './ProductInfo/AboutProductSection';
+import ProductInsightSection from './ProductInfo/ProductInsightSection';
 import ReviewsRatingsSection from './ProductInfo/ReviewsRatingsSection';
 import SuitabilitySection from './ProductInfo/SuitabilitySection';
 import SimilarProductsSection from './ProductInfo/SimilarProductsSection';
@@ -42,17 +41,14 @@ function ScrollableContent({ userData, messages }: ScrollableContentProps) {
 	return (
 		// Attach the ref to the scrollable div - No padding on main container
 		<div ref={scrollContainerRef} className="flex-grow overflow-y-auto bg-background-color">
-			{/* Header at full width with no extra padding */}
-			<HeaderSection userData={userData} />
-			
 			{/* Content sections with consistent padding */}
 			<div className="px-4">
 				<SubNavigationSection />
 				{/* TODO: Pass productContext down to these sections later */}
-				<AboutProductSection />
-				<ReviewsRatingsSection />
+				<ProductInsightSection />
+{/* 				<ReviewsRatingsSection />
 				<SuitabilitySection />
-				<SimilarProductsSection />
+				<SimilarProductsSection /> */}
 				{/* Pass messages down */}
 				<MessageDisplay messages={messages} />
 			</div>
