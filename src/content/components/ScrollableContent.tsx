@@ -4,9 +4,8 @@ import React, { useRef, useEffect } from 'react';
 import SubNavigationSection from './SubNavigation/SubNavigationSection';
 import ProductInsightSection from './ProductInfo/ProductInsightSection';
 import ReviewsRatingsSection from './ProductInfo/ReviewsRatingsSection';
-import SuitabilitySection from './ProductInfo/SuitabilitySection';
-import SimilarProductsSection from './ProductInfo/SimilarProductsSection';
 import MessageDisplay from './Chat/MessageDisplay';
+
 
 // Re-use UserData and ChatMessage interfaces (consider moving to a shared types file later)
 interface UserData {
@@ -23,11 +22,13 @@ interface ChatMessage {
 
 // Define props for ScrollableContent
 interface ScrollableContentProps {
-	userData: UserData;
+	userData: UserData | null;
 	messages: ChatMessage[];
+	title: string | null;
+	url: string | null;
 }
 
-function ScrollableContent({ userData, messages }: ScrollableContentProps) {
+function ScrollableContent({ userData, messages, title, url }: ScrollableContentProps) {
 	// Ref for the scrollable container
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -44,11 +45,8 @@ function ScrollableContent({ userData, messages }: ScrollableContentProps) {
 			{/* Content sections with consistent padding */}
 			<div className="px-4">
 				<SubNavigationSection />
-				{/* TODO: Pass productContext down to these sections later */}
-				<ProductInsightSection />
-{/* 				<ReviewsRatingsSection />
-				<SuitabilitySection />
-				<SimilarProductsSection /> */}
+				{/* Pass title prop to ProductInsightSection */}
+				<ProductInsightSection title={title} />
 				{/* Pass messages down */}
 				<MessageDisplay messages={messages} />
 			</div>

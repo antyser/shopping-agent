@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import ScrollableContent from './ScrollableContent'; // Placeholder import
-import ChatInputSection from './ChatInputSection'; // Placeholder import
+import ScrollableContent from './ScrollableContent';
+import ChatInputSection from './ChatInputSection';
 import HeaderSection from './HeaderSection/HeaderSection';
 
 // Define the structure for user data passed as props
@@ -13,6 +13,8 @@ interface UserData {
 // Define the props for MainView
 interface MainViewProps {
 	userData: UserData;
+	title: string | null;
+	url: string | null;
 }
 
 // Define the structure for a chat message
@@ -24,7 +26,7 @@ interface ChatMessage {
 	timestamp: Date;
 }
 
-function MainView({ userData }: MainViewProps) {
+function MainView({ userData, title, url }: MainViewProps) {
 	// State for managing chat messages
 	const [messages, setMessages] = useState<ChatMessage[]>([]);
 
@@ -51,13 +53,13 @@ function MainView({ userData }: MainViewProps) {
 
 			{/* Scrollable content area - make it grow */}
 			<div className="flex-1 overflow-y-auto">
-				<ScrollableContent userData={userData} messages={messages} />
+				<ScrollableContent userData={userData} messages={messages} title={title} url={url} />
 			</div>
 
 			{/* Fixed chat input area - prevent it from shrinking */}
-			<div className="flex-shrink-0">
+{/* 			<div className="flex-shrink-0">
 				<ChatInputSection handleSendMessage={handleSendMessage} />
-			</div>
+			</div> */}
 		</div>
 	);
 }

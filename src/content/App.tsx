@@ -12,8 +12,14 @@ import VerifyEmailView from './components/VerifyEmailView/VerifyEmailView';
 // Define possible view states within the panel (when not logged in or verifying)
 type AuthView = 'login' | 'signup';
 
+// Define props for the container component
+interface SidePanelContainerProps {
+    title: string | null;
+    url: string | null;
+}
+
 // Main App content component
-function SidePanelContainer() {
+function SidePanelContainer({ title, url }: SidePanelContainerProps) {
     // Get full auth state including verification status and error
     const { 
         isLoggedIn, 
@@ -87,7 +93,8 @@ function SidePanelContainer() {
                     photoURL,
                     email
                 };
-                return <MainView userData={userData} />; // Pass userData
+                // Pass the title and url down to MainView
+                return <MainView userData={userData} title={title} url={url} />;
             } else {
                 // User is logged in but email is not verified (or status unknown yet)
                 return <VerifyEmailView />;
@@ -121,11 +128,18 @@ function SidePanelContainer() {
 }
 
 // Main App component wrapping content with the provider
-function App() {
-    console.log("Rendering main App component with AuthProvider...");
+// Modify App to accept title and url props
+interface AppProps {
+    title: string | null;
+    url: string | null;
+}
+
+// Accept title and url props
+function App({ title, url }: AppProps) {
+    console.log("Rendering main App component with AuthProvider... Title:", title, "URL:", url);
     return (
         <AuthProvider>
-            <SidePanelContainer />
+            <SidePanelContainer title={title} url={url} />
         </AuthProvider>
     );
 }

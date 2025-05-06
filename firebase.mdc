@@ -1,0 +1,34 @@
+Description: 
+You are an expert in React, and Firebase Firestore, Working with Typescript to apps for chrome extension.
+
+
+    ---
+Code Structure
+shopping-agent/
+├── dist/                   # Built extension files (output)
+├── functions/              # Firebase Cloud Functions (Mock API)
+│   ├── index.js            # Cloud Functions entry point
+│   ├── package.json        # Dependencies for functions
+│   └── .eslintrc.js        # Linter config (optional)
+├── src/                    # Source code for the Chrome Extension
+│   ├── manifest.json       # Extension manifest
+│   ├── background/         # Background service worker scripts
+│   │   ├── index.ts        # Main service worker entry point
+│   │   ├── firebase.ts     # Firebase initialization & service export
+│   │   ├── auth.ts         # Authentication logic handlers
+│   ├── content/            # Content scripts injected into pages
+│   │   ├── index.js        # Main content script entry point
+│   │   ├── uiInjector.js   # Logic for injecting UI elements (optional)
+│   │   └── eventListeners.js # Page interaction listeners (scroll, etc.)
+│   ├── shared/             # Shared utilities and constants
+│   │   ├── constants.js    # Event types, storage keys, etc.
+│   │   └── utils.js        # Helper functions (throttling, etc.)
+│   └── assets/             # Static assets (icons, images)
+│       └── icon-128.png
+│       └── ...
+├── .gitignore
+├── package.json            # Project dependencies & build scripts
+└── README.md
+
+    Project Structure and File Naming
+// ... existing code ... 

@@ -71,180 +71,286 @@ onAuthStateChanged(auth, (user: User | null) => {
 });
 console.log("Auth state listener added (includes emailVerified and email).");
 
-/**
- * Listens for messages from other parts of the extension (e.g., popup).
- */
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  console.log(
-    "Unified Message Listener: Received message:",
-    message,
-    "from sender:",
-    sender
-  );
+// Define types for storage and messaging
+interface ProductInfo {
+  name: string;
+  url: string;
+}
 
-  // --- Actions typically from Popup or Options page ---
-  if (message.action === "loginWithGoogle") {
-    console.log("Handling 'loginWithGoogle' action...");
-    signInWithGoogle()
-      .then((userCredential: UserCredential | null) => {
-        console.log(
-          "Background: Google Login successful",
-          userCredential?.user?.uid
-        );
-        sendResponse({ status: "success", userId: userCredential?.user?.uid });
-      })
-      .catch((error: Error) => {
-        console.error("Background: Google Login failed", error);
-        let errorCode: string | null = null;
-        if (error && typeof error === "object" && "code" in error) {
-          errorCode = (error as { code: string }).code;
+// A more specific type for the PRODUCT_INFO_CAPTURED message
+interface ProductInfoCapturedMessage {
+  type: "PRODUCT_INFO_CAPTURED";
+  payload: ProductInfo;
+}
+
+// A general type for other potential messages (can be expanded)
+interface OtherMessage {
+  type: string; // Use specific literal types for other messages if known
+  payload?: unknown; // Use unknown instead of any
+  tabId?: number;
+}
+
+// Type for messages using 'action'
+interface ActionMessage {
+  action: string; // e.g., "loginWithGoogle", "loginWithEmail"
+  // Add other properties specific to action messages if needed
+  // For example, for loginWithEmail:
+  email?: string;
+  password?: string;
+  nickname?: string; // For signup
+  payload?: unknown; // Generic payload if actions vary widely
+}
+
+type BackgroundMessage =
+  | ProductInfoCapturedMessage
+  | OtherMessage
+  | ActionMessage;
+
+// Listener for messages from content scripts or other extension parts
+chrome.runtime.onMessage.addListener(
+  (
+    message: BackgroundMessage,
+    sender: chrome.runtime.MessageSender,
+    sendResponse: (response?: unknown) => void
+  ): boolean | undefined => {
+    console.log(
+      "Unified Message Listener: Received message:",
+      message,
+      "from sender:",
+      sender
+    );
+
+    // --- NEW: Check for 'action' property first for auth/command messages ---
+    if ("action" in message && typeof message.action === "string") {
+      const actionMessage = message as ActionMessage; // Type assertion
+
+      if (actionMessage.action === "loginWithGoogle") {
+        console.log("Handling 'loginWithGoogle' action...");
+        signInWithGoogle()
+          .then((userCredential: UserCredential | null) => {
+            console.log(
+              "Background: Google Login successful",
+              userCredential?.user?.uid
+            );
+            sendResponse({
+              status: "success",
+              userId: userCredential?.user?.uid,
+            });
+          })
+          .catch((error: Error) => {
+            console.error("Background: Google Login failed", error);
+            let errorCode: string | null = null;
+            // Safely try to access 'code'
+            if (error && typeof error === "object" && "code" in error) {
+              errorCode = (error as { code: string }).code;
+            }
+            const errorMessage = error.message || "An unknown error occurred";
+
+            if (
+              errorMessage.includes("cancelled") || // Broader check for cancellation
+              errorMessage.includes("closed by the user") ||
+              errorCode === "auth/popup-closed-by-user" || // Firebase specific
+              errorCode === "auth/cancelled-popup-request"
+            ) {
+              sendResponse({
+                status: "cancelled",
+                error: "Login cancelled by user.",
+              });
+            } else if (errorCode === "auth/network-request-failed") {
+              sendResponse({
+                status: "error",
+                error: "Network error during login. Please check connection.",
+              });
+            } else if (errorMessage.includes("chrome.identity")) {
+              // Check for chrome.identity issues
+              sendResponse({
+                status: "error",
+                error:
+                  "Browser identity error. Ensure extension permissions and OAuth Client ID are correct.",
+              });
+            } else {
+              sendResponse({
+                status: "error",
+                error: errorMessage,
+              });
+            }
+          });
+        return true; // Indicates asynchronous response
+      }
+
+      if (actionMessage.action === "loginWithEmail") {
+        console.log("Handling 'loginWithEmail' action...");
+        const { email, password } = actionMessage;
+
+        if (!email || !password) {
+          console.error("Background: Login missing email or password.");
+          sendResponse({
+            status: "error",
+            error: "Email and password are required for login.",
+          });
+          return false; // Synchronous response
         }
-        const errorMessage = error.message;
-        if (
-          errorCode === "auth/popup-closed-by-user" ||
-          errorCode === "auth/cancelled-popup-request"
-        ) {
-          sendResponse({
-            status: "cancelled",
-            error: "Login cancelled by user.",
+
+        signInWithEmail(email, password)
+          .then((userCredential: UserCredential) => {
+            console.log(
+              "Background: Email Login successful",
+              userCredential.user.uid
+            );
+            sendResponse({
+              status: "success",
+              userId: userCredential.user.uid,
+            });
+          })
+          .catch((error: Error) => {
+            console.error("Background: Email Login failed", error);
+            sendResponse({ status: "error", error: error.message });
           });
-        } else if (errorCode === "auth/network-request-failed") {
+        return true; // Indicates asynchronous response
+      }
+
+      if (actionMessage.action === "signupWithEmail") {
+        console.log("Handling 'signupWithEmail' action...");
+        const { email, password, nickname } = actionMessage;
+        if (!email || !password) {
           sendResponse({
             status: "error",
-            error: "Network error during login. Please check connection.",
+            error: "Email and password are required for signup.",
           });
-        } else if (error.message && error.message.includes("chrome.identity")) {
+          return false;
+        }
+        signUpAndVerifyUser(email, password, nickname || null)
+          .then((userCredential) => {
+            sendResponse({
+              status: "success",
+              userId: userCredential.user.uid,
+            });
+          })
+          .catch((error: Error) => {
+            sendResponse({ status: "error", error: error.message });
+          });
+        return true;
+      }
+
+      if (actionMessage.action === "logout") {
+        console.log("Handling 'logout' action...");
+        signOutUser()
+          .then(() => {
+            sendResponse({ status: "success" });
+          })
+          .catch((error: Error) => {
+            sendResponse({ status: "error", error: error.message });
+          });
+        return true;
+      }
+
+      if (actionMessage.action === "resendVerificationEmail") {
+        console.log("Handling 'resendVerificationEmail' action...");
+        resendVerificationEmailHandler()
+          .then(() => {
+            sendResponse({
+              status: "success",
+              message: "Verification email resent.",
+            });
+          })
+          .catch((error: Error) => {
+            sendResponse({ status: "error", error: error.message });
+          });
+        return true;
+      }
+
+      // Add other 'action' handlers here if needed
+
+      // If action is not recognized by this block:
+      console.log(
+        "Unified Message Listener: Unhandled action type:",
+        actionMessage.action
+      );
+      sendResponse({
+        success: false,
+        error: `Unhandled action: ${actionMessage.action}`,
+      });
+      return false; // Synchronous response for unhandled actions
+    }
+    // --- END NEW action handling block ---
+
+    // --- Existing 'type' based handling ---
+    // Type guard to ensure 'type' exists before checking its value
+    if ("type" in message && message.type === "PRODUCT_INFO_CAPTURED") {
+      const productInfoMessage = message as ProductInfoCapturedMessage; // Type assertion
+      // Ensure the message came from a tab
+      if (!sender.tab?.id) {
+        console.warn(
+          "Shopping Agent: Received PRODUCT_INFO_CAPTURED without sender.tab.id"
+        );
+        sendResponse({
+          success: false,
+          error: "Message must come from a content script in a tab.",
+        });
+        return false; // Indicate synchronous response
+      }
+
+      const tabId: number = sender.tab.id;
+      const productInfo = productInfoMessage.payload; // Type is already ProductInfo due to check
+      const key = `productInfo_${tabId}`; // Store per-tab
+
+      console.log(
+        `Shopping Agent: Received PRODUCT_INFO_CAPTURED for tab ${tabId}:`,
+        productInfo
+      );
+
+      chrome.storage.local.set({ [key]: productInfo }, () => {
+        if (chrome.runtime.lastError) {
+          console.error(
+            `Shopping Agent: Error storing product info for tab ${tabId}:`,
+            chrome.runtime.lastError.message
+          );
+          // Send failure response back to the content script
           sendResponse({
-            status: "error",
-            error:
-              "Browser identity error. Ensure extension permissions are granted.",
+            success: false,
+            error: chrome.runtime.lastError.message,
           });
         } else {
-          sendResponse({
-            status: "error",
-            error: errorMessage || "An unknown login error occurred.",
-          });
+          console.log(
+            `Shopping Agent: Stored product info for tab ${tabId} under key ${key}.`
+          );
+          // Send success response back to the content script
+          sendResponse({ success: true, storedKey: key });
         }
       });
-    return true;
-  }
 
-  if (message.action === "loginWithEmail") {
-    console.log("Handling 'loginWithEmail' action...");
-    const { email, password } = message;
-
-    if (!email || !password) {
-      console.error("Background: Login missing email or password.");
-      sendResponse({
-        status: "error",
-        error: "Email and password are required for login.",
-      });
-      return false;
+      return true; // Crucial: Indicates that sendResponse will be called asynchronously
     }
-
-    signInWithEmail(email, password)
-      .then((userCredential: UserCredential) => {
-        console.log(
-          "Background: Email Login successful",
-          userCredential.user.uid
-        );
-        sendResponse({ status: "success", userId: userCredential.user.uid });
-      })
-      .catch((error: Error) => {
-        console.error("Background: Email Login failed", error);
-        sendResponse({
-          status: "error",
-          error: error.message || "Login failed.",
-        });
-      });
-    return true;
+    // If the message type isn't handled, indicate synchronous response (or no response needed)
+    // --- MODIFIED: This part is effectively a fallback if neither 'action' nor known 'type' matched ---
+    console.log(
+      "Unified Message Listener: Received unhandled message structure:",
+      message
+    );
+    sendResponse({
+      success: false,
+      error: "Unknown message structure or type.",
+    });
+    return false; // Synchronous response
   }
+);
 
-  if (message.action === "signupWithEmail") {
-    console.log("Handling 'signupWithEmail' action...");
-    const { email, password, nickname } = message;
-    if (!email || !password) {
-      console.error("Background: Signup missing email or password.");
-      sendResponse({
-        status: "error",
-        error: "Email and password are required for signup.",
-      });
-      return false;
+// Optional: Add listener for when a tab is removed to clean up storage
+chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
+  const key = `productInfo_${tabId}`;
+  chrome.storage.local.remove(key, () => {
+    if (chrome.runtime.lastError) {
+      console.error(
+        `Shopping Agent: Error removing stored info for closed tab ${tabId}:`,
+        chrome.runtime.lastError.message
+      );
+    } else {
+      console.log(
+        `Shopping Agent: Removed stored info for closed tab ${tabId} (key: ${key}).`
+      );
     }
-    if (password.length < 6) {
-      console.error("Background: Signup password too short.");
-      sendResponse({
-        status: "error",
-        error: "Password must be at least 6 characters long.",
-      });
-      return false;
-    }
-    signUpAndVerifyUser(email, password, nickname || null)
-      .then((userCredential: UserCredential) => {
-        console.log(
-          "Background: Email Signup successful",
-          userCredential.user.uid
-        );
-        sendResponse({
-          status: "success",
-          userId: userCredential.user.uid,
-          message: "Account created, verification email sent.",
-        });
-      })
-      .catch((error: Error) => {
-        console.error("Background: Email Signup failed", error);
-        sendResponse({
-          status: "error",
-          error: error.message || "Signup failed.",
-        });
-      });
-    return true;
-  }
-
-  if (message.action === "logout") {
-    console.log("Handling 'logout' action...");
-    signOutUser()
-      .then(() => {
-        console.log("Background: Logout successful");
-        sendResponse({ status: "success" });
-      })
-      .catch((error: Error) => {
-        console.error("Background: Logout failed", error);
-        sendResponse({ status: "error", error: error.message });
-      });
-    return true;
-  }
-
-  // Task 6.1: Add handler for resendVerificationEmail
-  if (message.action === "resendVerificationEmail") {
-    console.log("Handling 'resendVerificationEmail' action...");
-    resendVerificationEmailHandler()
-      .then(() => {
-        console.log("Background: Resend verification email successful.");
-        sendResponse({
-          status: "success",
-          message: "Verification email resent.",
-        });
-      })
-      .catch((error: Error) => {
-        console.error("Background: Resend verification email failed", error);
-        sendResponse({
-          status: "error",
-          error: error.message || "Failed to resend email.",
-        });
-      });
-    return true; // Indicate async response
-  }
-
-  // --- Default handling for unrecognised messages ---
-  console.log(
-    "Unified Message Listener: Unhandled message type/action:",
-    message.type || message.action
-  );
-  return false;
+  });
 });
-
-console.log("Unified Message listener added.");
 
 // Listen for clicks on the browser action icon
 chrome.action.onClicked.addListener((tab) => {
